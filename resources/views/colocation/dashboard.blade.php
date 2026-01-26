@@ -39,11 +39,11 @@
                             </ul>
                             @else
                             <p>Aucun membre dans cette colocation.</p>
-                        @endif
+                            @endif
                         </div>
                     </div>
 
-                    
+
                 </div>
             </div>
             @else
@@ -63,27 +63,65 @@
             </div>
 
             @endif
+            
+            @if($myColoc)
+            <a href="{{ route('expenses.create') }}"
+                class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 transition ease-in-out duration-150 shadow-sm">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Ajouter une dépense
+            </a>
+
+            @if(auth()->id() === $myColoc->owner_id)
+            <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-emerald-500">
+                <div class="p-6">
+                    <h3 class="text-lg font-bold mb-6 text-gray-800">🔗 Inviter un colocataire</h3>
+
+                    <form action="{{ route('invitation.send',$myColoc->id) }}" method="POST">
+                        @csrf
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Adresse e-mail</label>
+                            <input type="email" name="email" required placeholder="mail@exemple.com" class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-4 py-2">
+                        </div>
+
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <p class="text-sm text-gray-600 mb-4">Choisissez le mode d'invitation :</p>
+                            <div class="flex gap-3">
+                                <button type="submit" name="method" value="mail" class="flex-1 bg-indigo-600 text-white px-4 py-3 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center font-medium">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Envoyer un lien
+                                </button>
+
+                                <button type="submit" name="method" value="token" class="flex-1 bg-gray-800 text-white px-4 py-3 rounded-lg hover:bg-gray-900 transition flex items-center justify-center font-medium">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Générer un code
+                                </button>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-gray-500">L'invitation expirera dans 48 heures.</p>
+                    </form>
+                </div>
+            </div>
+            @else
+            <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div class="flex gap-3">
+                    <svg class="w-6 h-6 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zm-11-1a1 1 0 11-2 0 1 1 0 012 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        <p class="text-blue-800 font-medium">Gestion des invitations</p>
+                        <p class="text-sm text-blue-700 mt-1">Seul l'administrateur de la colocation peut inviter de nouveaux membres.</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+            @endif
         </div>
     </div>
-    <form action="{{ route('invitation.send',$myColoc->id) }}" method="POST" class="bg-white p-6 rounded-xl shadow-sm border">
-    @csrf
-    <h3 class="text-lg font-bold mb-4">Inviter un colocataire</h3>
-    
-    <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
-        <input type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-    </div>
-
-    <div class="flex space-x-3">
-        <button type="submit" name="method" value="mail" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-            Envoyer par Mail
-        </button>
-
-        <button type="submit" name="method" value="token" class="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition flex items-center justify-center">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-            Générer un Code
-        </button>
-    </div>
-</form>
 </x-app-layout>

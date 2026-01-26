@@ -27,27 +27,61 @@
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-1 space-y-6">
                     <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
-                        <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2">Soldes</h3>
+                        <h3 class="font-bold text-lg mb-4 text-gray-700 border-b pb-2">💰 Détail par personne</h3>
                         <div class="space-y-4">
                             @foreach($members as $member)
-                                <div class="flex justify-between items-center">
-                                    <span class="text-gray-600">{{ $member->name }}</span>
-                                    <span class="px-2 py-1 rounded-full text-sm font-bold {{ $member->balance >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                                        {{ $member->balance >= 0 ? '+' : '' }}{{ number_format($member->balance, 2) }} €
-                                    </span>
+                                <div class="bg-gray-50 p-4 rounded-lg border-l-4 {{ $member->balance >= 0 ? 'border-green-500' : 'border-red-500' }}">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="font-bold text-gray-800">{{ $member->name }}</span>
+                                        <span class="text-xs bg-gray-200 text-gray-700 px-2 py-1 rounded">{{ number_format($member->balance, 2) }} €</span>
+                                    </div>
+                                    <div class="text-xs text-gray-600 space-y-1">
+                                        <div class="flex justify-between">
+                                            <span>Montant payé:</span>
+                                            <span class="font-semibold text-indigo-600">{{ number_format($member->total_paid ?? 0, 2) }} €</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Part individuelle:</span>
+                                            <span class="font-semibold">{{ number_format($share, 2) }} €</span>
+                                        </div>
+                                        <div class="flex justify-between pt-1 border-t border-gray-200">
+                                            <span class="font-bold">Solde:</span>
+                                            <span class="font-black {{ $member->balance >= 0 ? 'text-green-600' : 'text-red-600' }}">
+                                                {{ $member->balance >= 0 ? '+' : '' }}{{ number_format($member->balance, 2) }} €
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
 
-                        <h3 class="font-bold text-lg mt-8 mb-4 text-gray-700 border-b pb-2">Remboursements</h3>
-                        <div class="space-y-2">
+                        <h3 class="font-bold text-lg mt-8 mb-4 text-gray-700 border-b pb-2">🔄 Qui doit à qui</h3>
+                        <div class="space-y-3">
                             @forelse($settlements as $settlement)
-                                <div class="p-3 bg-indigo-50 rounded-lg text-sm text-indigo-700 border border-indigo-100">
-                                    <span class="font-bold">{{ $settlement['from'] }}</span> ➔ <span class="font-bold">{{ $settlement['to'] }}</span>
-                                    <div class="text-lg font-black mt-1">{{ number_format($settlement['amount'], 2) }} €</div>
+                                <div class="p-4 bg-gradient-to-r from-orange-50 to-amber-50 rounded-lg border border-orange-200">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="flex-shrink-0">
+                                            <div class="flex items-center justify-center h-8 w-8 rounded-full bg-orange-200 text-orange-700 text-xs font-bold">
+                                                {{ substr($settlement['from'], 0, 1) }}
+                                            </div>
+                                        </div>
+                                        <div class="flex-grow">
+                                            <p class="text-sm font-bold text-gray-800">
+                                                <span class="text-orange-700">{{ $settlement['from'] }}</span> doit payer à <span class="text-orange-700">{{ $settlement['to'] }}</span>
+                                            </p>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div class="text-lg font-black text-orange-700">
+                                                {{ number_format($settlement['amount'], 2) }} €
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             @empty
-                                <p class="text-gray-500 italic text-sm text-center py-4">Tout est équilibré !</p>
+                                <div class="p-4 bg-green-50 rounded-lg border border-green-200 text-center">
+                                    <p class="text-green-700 font-semibold">✓ Tout est équilibré !</p>
+                                    <p class="text-xs text-green-600 mt-1">Aucun remboursement à effectuer</p>
+                                </div>
                             @endforelse
                         </div>
                     </div>
@@ -66,13 +100,15 @@
                                         <th class="px-6 py-4">Titre</th>
                                         <th class="px-6 py-4">Payeur</th>
                                         <th class="px-6 py-4 text-right">Montant</th>
+                                        <th class="px-6 py-4 text-center">Statut</th>
+                                        <th class="px-6 py-4 text-center">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
                                     @foreach($expenses as $expense)
                                         <tr class="hover:bg-gray-50 transition-colors">
-                                            <td class="px-6 py-4 whitespace-nowrap">{{ $expense->spent_at->format('d/m/Y') }}</td>
-                                            <td class="px-6 py-4 font-semibold">{{ $expense->title }}</td>
+                                            <td class="px-6 py-4 whitespace-nowrap">{{ $expense->date->format('d/m/Y') }}</td>
+                                            <td class="px-6 py-4 font-semibold">{{ $expense->titre_expense }}</td>
                                             <td class="px-6 py-4">
                                                 <div class="flex items-center">
                                                     <div class="h-7 w-7 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-xs mr-2 font-bold uppercase">
@@ -81,7 +117,21 @@
                                                     {{ $expense->user->name }}
                                                 </div>
                                             </td>
-                                            <td class="px-6 py-4 text-right font-bold text-gray-900">{{ number_format($expense->amount, 2) }} €</td>
+                                            <td class="px-6 py-4 text-right font-bold text-gray-900">{{ number_format($expense->montant_expense, 2) }} €</td>
+                                            <td class="px-6 py-4 text-center">
+                                                <span class="px-3 py-1 rounded-full text-xs font-semibold {{ $expense->is_paid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                                                    {{ $expense->is_paid ? '✓ Payée' : 'En attente' }}
+                                                </span>
+                                            </td>
+                                            <td class="px-6 py-4 text-center">
+                                                <form action="{{ route('expenses.markAsPaid', $expense->id_expenses) }}" method="POST" class="inline">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <button type="submit" class="inline-flex items-center px-3 py-1 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 transition-colors">
+                                                        {{ $expense->is_paid ? '↶ Annuler' : '✓ Marquer payée' }}
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
