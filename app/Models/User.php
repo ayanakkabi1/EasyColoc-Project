@@ -47,4 +47,15 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public function colocations()
+{
+    return $this->belongsToMany(Colocation::class)
+                ->withPivot('role')
+                ->withTimestamps();
+}
+    public function activecolocation(){
+        $this->colocations()
+            ->where('colocations.status', 'active')
+            ->first();
+    }
 }
