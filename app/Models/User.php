@@ -48,14 +48,16 @@ class User extends Authenticatable
         ];
     }
     public function colocations()
-{
+    {
     return $this->belongsToMany(Colocation::class)
                 ->withPivot('role')
                 ->withTimestamps();
-}
+    }
+    
     public function activecolocation(){
-        $this->colocations()
+        return $this->colocations()
             ->where('colocations.status', 'active')
+            ->with('users')
             ->first();
     }
 }
