@@ -21,6 +21,7 @@ Route::get('/create', function () {
     return view('colocation.create');
 });
 Route::middleware('auth')->group(function () {
+    Route::get('/colocation/dashboard', [ColocationController::class, 'afficherColocation'])->name('colocation.show');
     Route::get('/create', [ColocationController::class, 'CreateColocation'])->name('colocation.create');
     Route::post('/colocation/store', [ColocationController::class, 'storeColocation'])->name('Colocation.store');
 });
