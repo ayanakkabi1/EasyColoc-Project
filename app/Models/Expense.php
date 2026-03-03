@@ -8,20 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Expense extends Model
 {
    use HasFactory;
-
+   protected $casts = [
+        'date' => 'date',
+        'paid_at' => 'datetime',
+        'is_paid' => 'boolean',
+    ];
+    protected $primaryKey = 'id_expenses';
     protected $fillable = [
-        'title',
-        'amount',
-        'spent_at',
+        'titre_expense',
+        'montant_expense',
+        'date',
         'category',
         'colocation_id',
         'user_id',
         'description',
-    ];
-
-
-    protected $casts = [
-        'spent_at' => 'date',
+        'is_paid',
+        'paid_at',
     ];
 
    
