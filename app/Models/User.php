@@ -56,7 +56,7 @@ class User extends Authenticatable
     
     public function activecolocation(){
         return $this->colocations()
-            ->where('colocations.status', 'active')
+            ->where('colocations.statut', 'active')
             ->with('users')
             ->first();
     }
