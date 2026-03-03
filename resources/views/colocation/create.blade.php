@@ -1,39 +1,73 @@
 <x-app-layout>
-    <div class="py-12">
+    <div class="py-12 bg-gray-50 min-h-screen">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg border-t-4 border-purple-600">
-                <div class="p-8">
-                    <div class="mb-8">
-                        <h2 class="text-2xl font-bold text-purple-800"> Créer une nouvelle colocation</h2>
-                        <p class="text-gray-600">Remplissez les informations pour trouver vos futurs colocataires.</p>
-                    </div>
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl p-8">
+                
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800">Ajouter une dépense</h2>
+                    <p class="text-gray-500 text-sm">Remplissez les détails pour partager les frais avec la colocation.</p>
+                </div>
 
-                    <form action="{{ route('Colocation.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
-                        @csrf
+                <form action="{{ route('expenses.store') }}" method="POST">
+                    @csrf
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="titre_expense" class="block text-sm font-semibold text-gray-700 mb-2">Objet de la dépense</label>
+                            <input type="text" name="titre_expense" id="titre_expense" 
+                                   placeholder="Ex: Courses hebdomadaires, Facture EDF..."
+                                   class="w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" required>
+                            @error('titre_expense') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
 
                         <div>
-                            <x-input-label for="name" :value="__('nom de Colocation')" class="text-purple-700 font-semibold" />
-                            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full border-purple-200 focus:ring-purple-500 focus:border-purple-500" placeholder="Ex: Bel appartement centre-ville" required />
-                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                            <label for="montant_expense" class="block text-sm font-semibold text-gray-700 mb-2">Montant (€)</label>
+                            <div class="relative">
+                                <input type="number" step="0.01" name="montant_expense" id="montant_expense" 
+                                       class="w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm pl-8" 
+                                       placeholder="0.00" required>
+                                <span class="absolute left-3 top-2.5 text-gray-400">€</span>
+                            </div>
+                            @error('montant_expense') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                         </div>
-                        
-                        <div class="flex items-center justify-end mt-8 border-t border-gray-100 pt-6">
-                            <x-primary-button class="bg-purple-600 hover:bg-purple-700 px-6 py-3 text-lg">
-                                {{ __('Publier Colocation') }}
-                            </x-primary-button>
+
+                        <div>
+                            <label for="date" class="block text-sm font-semibold text-gray-700 mb-2">Date d'achat</label>
+                            <input type="date" name="date" id="date" value="{{ date('Y-m-d') }}"
+                                   class="w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm" required>
                         </div>
-                    </form>
-                </div>
+
+                        <div>
+                            <label for="category" class="block text-sm font-semibold text-gray-700 mb-2">Catégorie</label>
+                            <select name="category" id="category" 
+                                    class="w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm">
+                                <option value="Courses">🛒 Courses</option>
+                                <option value="Loyer">🏠 Loyer & Charges</option>
+                                <option value="Énergie">⚡ Énergie</option>
+                                <option value="Internet">🌐 Internet</option>
+                                <option value="Divers">✨ Divers</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label for="description" class="block text-sm font-semibold text-gray-700 mb-2">Description (Optionnel)</label>
+                            <textarea name="description" id="description" rows="3" 
+                                      class="w-full rounded-xl border-gray-200 focus:border-indigo-500 focus:ring-indigo-500 shadow-sm"
+                                      placeholder="Précisez ce qui a été acheté..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex items-center justify-end gap-4">
+                        <a href="{{ route('dashboard') }}" class="text-sm font-semibold text-gray-600 hover:text-gray-900 transition">
+                            Annuler
+                        </a>
+                        <button type="submit" 
+                                class="bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-indigo-700 transition transform active:scale-95">
+                            Enregistrer la dépense
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-    <script>
-        function updateFileName(input) {
-            const fileName = input.files[0]?.name;
-            if (fileName) {
-                document.getElementById('file-name').textContent = "Fichier choisi : " + fileName;
-            }
-        }
-    </script>
 </x-app-layout>

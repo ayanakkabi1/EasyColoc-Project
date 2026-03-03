@@ -26,7 +26,12 @@
                 </svg>
                 <span class="mx-4 font-medium">Colocations</span>
             </x-nav-link>
-
+            <x-nav-link :href="route('expenses.index')" :active="request()->routeIs('expenses.*')" class="w-full flex items-center px-4 py-3 mt-2 rounded-lg border-none">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="mx-4 font-medium">{{ __('Dépenses') }}</span>
+            </x-nav-link>
             <div class="px-4 mt-6">
                 <span class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Admin</span>
             </div>
