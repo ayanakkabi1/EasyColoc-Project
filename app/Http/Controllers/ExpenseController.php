@@ -70,6 +70,39 @@ class ExpenseController extends Controller
         return redirect()->route('expenses.index')->with('success', 'Dépense ajoutée !');
     }
 
+    public function edit(Expense $expense)
+    {
+        if ($expense->user_id !== Auth::id()) {
+            return redirect()->route('expenses.index')->with('error', 'Vous ne pouvez pas modifier cette dépense.');
+        }
+
+        return view('expenses.edit', compact('expense'));
+    }
+
+    public function update(Request $request, Expense $expense)
+    {
+        if ($expense->user_id !== Auth::id()) {
+            return back()->with('error', 'Vous ne pouvez pas modifier cette dépense.');
+        }
+
+        $request->validate([
+            'title' => 'required|string|max:100',
+            'amount' => 'required|numeric|min:0.01',
+            'spent_at' => 'required|date',
+            'category' => 'nullable|string',
+        ]);
+
+        $expense->update([
+            'titre_expense' => $request->title,
+            'montant_expense' => $request->amount,
+            'date' => $request->spent_at,
+            'category' => $request->category,
+            'description' => $request->description,
+        ]);
+
+        return redirect()->route('expenses.index')->with('success', 'Dépense mise à jour !');
+    }
+
     public function destroy(Expense $expense)
     {
         if ($expense->user_id !== Auth::id()) {
