@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Auth;
 
 class ExpenseController extends Controller
 {
-    /**
-     * Affiche la liste globale (Tableau de bord de la coloc)
-     */
     public function index()
     {
         /** @var \App\Models\User $user */
@@ -26,27 +23,21 @@ class ExpenseController extends Controller
         $expenses = $coloc->expenses()->with('user')->orderBy('date', 'desc')->get();
         $totalAmount = $coloc->getTotalExpenses(); 
         $share = $coloc->getIndividualShare();
-        $members = $coloc->getMembersWithBalances($expenses, $share);
+        $members = $coloc->getMembersWithBalances();
         $settlements = $this->calculateSettlements($members);
 
-        // ICI : On renvoie vers 'expenses.index'
+        
         return view('expenses.index', compact('expenses', 'coloc', 'totalAmount', 'share', 'members', 'settlements'));
     }
 
-    /**
-     * Affiche le formulaire de création
-     */
     public function create()
     {
         return view('expenses.create');
     }
 
-    /**
-     * Affiche le détail d'une dépense spécifique
-     */
     public function show(Expense $expense)
     {
-        $expense->load('user'); // Indispensable pour voir qui a payé cette dépense précise
+        $expense->load('user'); 
         return view('expenses.show', compact('expense'));
     }
 
@@ -67,9 +58,9 @@ class ExpenseController extends Controller
         }
         
         Expense::create([
-            'title' => $request->title,
-            'amount' => $request->amount,
-            'spent_at' => $request->spent_at,
+            'titre_expense' => $request->title,
+            'montant_expense' => $request->amount,
+            'date' => $request->spent_at,
             'category' => $request->category,
             'description' => $request->description,
             'user_id' => $user->id,
@@ -89,10 +80,20 @@ class ExpenseController extends Controller
         return back()->with('success', 'Dépense supprimée.');
     }
 
+    public function markAsPaid(Expense $expense)
+    {
+        $expense->update([
+            'is_paid' => !$expense->is_paid,
+            'paid_at' => $expense->is_paid ? null : now(),
+        ]);
+
+        $status = $expense->is_paid ? 'non payée' : 'payée';
+        return back()->with('success', "Dépense marquée comme {$status}.");
+    }
+
     private function calculateSettlements($members)
     {
         $settlements = [];
-        // Cloner les membres pour ne pas modifier les objets originaux utilisés dans la vue
         $debtors = $members->filter(fn($m) => $m->balance < -0.01)->sortBy('balance');
         $creditors = $members->filter(fn($m) => $m->balance > 0.01)->sortByDesc('balance');
 
