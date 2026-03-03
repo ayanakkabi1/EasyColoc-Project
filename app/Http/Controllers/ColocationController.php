@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class ColocationController extends Controller
 {
-   public function afficherColocation(){
+   public function afficherColocation()
+   {
       /** @var \App\Models\User $user */
     $user = Auth::user();
     $colocactuelle=$user->activecolocation();
@@ -41,6 +42,5 @@ class ColocationController extends Controller
          'role' => 'owner'
       ]);
       return redirect()->route('dashboard')->with('success', 'Colocation créée avec succès !');
-   }
-   public function UpdateColocation() {}
+   }  
 }
