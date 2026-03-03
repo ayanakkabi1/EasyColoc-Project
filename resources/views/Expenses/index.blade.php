@@ -124,13 +124,29 @@
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 text-center">
-                                                <form action="{{ route('expenses.markAsPaid', $expense->id_expenses) }}" method="POST" class="inline">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <button type="submit" class="inline-flex items-center px-3 py-1 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 transition-colors">
-                                                        {{ $expense->is_paid ? '↶ Annuler' : '✓ Marquer payée' }}
-                                                    </button>
-                                                </form>
+                                                <div class="flex items-center justify-center gap-2">
+                                                    <form action="{{ route('expenses.markAsPaid', $expense->id_expenses) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="inline-flex items-center px-3 py-1 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 transition-colors">
+                                                            {{ $expense->is_paid ? '↶ Annuler' : '✓ Marquer payée' }}
+                                                        </button>
+                                                    </form>
+                                                    
+                                                    @if(Auth::id() === $expense->user_id)
+                                                        <a href="{{ route('expenses.edit', $expense->id_expenses) }}" class="inline-flex items-center px-3 py-1 bg-amber-500 text-white text-xs rounded-md hover:bg-amber-600 transition-colors">
+                                                            ✎ Modifier
+                                                        </a>
+                                                        
+                                                        <form action="{{ route('expenses.destroy', $expense->id_expenses) }}" method="POST" class="inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette dépense ?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="inline-flex items-center px-3 py-1 bg-red-600 text-white text-xs rounded-md hover:bg-red-700 transition-colors">
+                                                                🗑 Supprimer
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
