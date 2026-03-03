@@ -65,4 +65,25 @@
             @endif
         </div>
     </div>
+    <form action="{{ route('invitation.send',$myColoc->id) }}" method="POST" class="bg-white p-6 rounded-xl shadow-sm border">
+    @csrf
+    <h3 class="text-lg font-bold mb-4">Inviter un colocataire</h3>
+    
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700">Adresse e-mail</label>
+        <input type="email" name="email" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+    </div>
+
+    <div class="flex space-x-3">
+        <button type="submit" name="method" value="mail" class="flex-1 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+            Envoyer par Mail
+        </button>
+
+        <button type="submit" name="method" value="token" class="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 transition flex items-center justify-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+            Générer un Code
+        </button>
+    </div>
+</form>
 </x-app-layout>
