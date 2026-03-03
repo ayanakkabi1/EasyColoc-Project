@@ -16,7 +16,7 @@ class InvitationColocMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public $colocname,public $token)
+    public function __construct(public $colocname, public $token, public $type)
     {
        
        
@@ -28,7 +28,7 @@ class InvitationColocMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Invitation Coloc Mail',
+            subject: 'Invitation à rejoindre une colocation - EasyColoc',
         );
     }
 
@@ -39,6 +39,11 @@ class InvitationColocMail extends Mailable
     {
         return new Content(
             view: 'emails.invitation',
+            with: [
+                'colocname' => $this->colocname,
+                'token' => $this->token,
+                'type' => $this->type,
+            ],
         );
     }
 
