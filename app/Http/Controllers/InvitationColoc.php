@@ -16,6 +16,12 @@ class InvitationColoc extends Controller
     public function envoyerinvitation(InvitationColocRequest $request,$colocId){
         $token = strtoupper(Str::random(8));
         $coloc = Colocation::findOrfail($colocId);
+        
+        // Vérifier que l'utilisateur est le propriétaire
+        if ($coloc->owner_id !== Auth::id()) {
+            return back()->with('error', 'Seul l\'administrateur peut inviter des membres.');
+        }
+        
         $invitation =Invitation::updateOrCreate(
             [
                 'email' => $request->email,
@@ -38,19 +44,27 @@ class InvitationColoc extends Controller
        return redirect()->route('colocation.show')
                      ->with('success', 'L\'invitation a bien été envoyée à ' . $request->email);
     }
-    public function accepterInvitation(Request $request, $token = null){
-        $inputToken = $token ?? $request->input('token');
-       if (!$inputToken) {
-            return redirect()->route('dashboard')->with('error', 'Veuillez fournir un code d\'invitation.');
-        }
-       
-        $invitation = Invitation::where('token', strtoupper($inputToken))
-            ->where('expires_at', '>', now()) 
-            ->whereNull('used_at')            
+    public function showCodeForm()
+    {
+        return view('invitation.byCode');
+    }
+
+    public function validateCode(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string|size:8',
+        ], [
+            'token.required' => 'Le code d\'invitation est obligatoire.',
+            'token.size' => 'Le code doit contenir 8 caractères.',
+        ]);
+
+        $invitation = Invitation::where('token', strtoupper($request->token))
+            ->where('expires_at', '>', now())
+            ->whereNull('used_at')
             ->first();
-       
+
         if (!$invitation) {
-            return redirect()->route('dashboard')->with('error', 'Ce code est invalide, expiré ou a déjà été utilisé.');
+            return back()->with('error', 'Ce code est invalide, expiré ou a déjà été utilisé.');
         }
 
         /** @var \App\Models\User $user */
@@ -60,15 +74,85 @@ class InvitationColoc extends Controller
             return redirect()->route('dashboard')->with('error', 'Vous faites déjà partie d\'une colocation.');
         }
 
-        
         $user->colocations()->attach($invitation->colocation_id, [
             'role' => 'membre',
             'created_at' => now()
         ]);
 
-        
         $invitation->update(['used_at' => now()]);
 
-        return redirect()->route('colocation.dashboard')->with('success', 'Bienvenue dans votre nouvelle colocation !');
+        return redirect()->route('colocation.show')->with('success', 'Bienvenue dans votre nouvelle colocation !');
+    }
+
+    public function showInvitation($token)
+    {
+        if (!$token) {
+            return redirect()->route('dashboard')->with('error', 'Lien d\'invitation invalide.');
+        }
+
+        $invitation = Invitation::where('token', strtoupper($token))
+            ->where('expires_at', '>', now())
+            ->whereNull('used_at')
+            ->firstOrFail();
+
+        $colocation = $invitation->colocation;
+
+        // Si l'utilisateur n'est pas connecté, le rediriger vers l'inscription
+        if (!Auth::check()) {
+            return redirect()->route('register', ['invitation_token' => $token])
+                ->with('info', 'Créez un compte pour rejoindre la colocation « ' . $colocation->name . ' »');
+        }
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // Vérifier si l'utilisateur est déjà dans une colocation
+        if ($user->colocations()->exists()) {
+            return redirect()->route('dashboard')->with('error', 'Vous faites déjà partie d\'une colocation.');
+        }
+
+        return view('invitation.confirm', compact('invitation', 'colocation'));
+    }
+
+    public function acceptInvitation(Request $request)
+    {
+        $token = $request->input('token');
+
+        if (!$token) {
+            return redirect()->route('dashboard')->with('error', 'Lien d\'invitation invalide.');
+        }
+
+        $invitation = Invitation::where('token', strtoupper($token))
+            ->where('expires_at', '>', now())
+            ->whereNull('used_at')
+            ->firstOrFail();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->colocations()->exists()) {
+            return redirect()->route('dashboard')->with('error', 'Vous faites déjà partie d\'une colocation.');
+        }
+
+        $user->colocations()->attach($invitation->colocation_id, [
+            'role' => 'membre',
+            'created_at' => now()
+        ]);
+
+        $invitation->update(['used_at' => now()]);
+
+        return redirect()->route('colocation.show')->with('success', 'Bienvenue dans votre nouvelle colocation !');
+    }
+
+    public function declineInvitation($token)
+    {
+        $invitation = Invitation::where('token', strtoupper($token))
+            ->where('expires_at', '>', now())
+            ->whereNull('used_at')
+            ->firstOrFail();
+
+        $invitation->update(['used_at' => now()]);
+
+        return redirect()->route('dashboard')->with('success', 'Vous avez refusé l\'invitation.');
     }
 }
