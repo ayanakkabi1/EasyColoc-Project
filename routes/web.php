@@ -6,14 +6,20 @@ use App\Http\Controllers\InvitationColoc;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Routes d'invitation (publiques)
+Route::get('/invitation/{token}', [InvitationColoc::class, 'showInvitation'])->name('invitation.show');
+Route::get('/invitation-code', [InvitationColoc::class, 'showCodeForm'])->name('invitation.codeForm');
+
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,9 +34,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/create', [ColocationController::class, 'CreateColocation'])->name('colocation.create');
     Route::post('/colocation/store', [ColocationController::class, 'storeColocation'])->name('Colocation.store');
     Route::post('/invitation/envoyer/{colocId}', [InvitationColoc::class, 'envoyerInvitation'])->name('invitation.send');
-    Route::get ('/coloc/rejoindre/{token}', [InvitationColoc::class, 'accepterInvitation'])->name('colocation.join');
-    Route::post('/coloc/rejoindre/manuel', [InvitationColoc::class, 'accepterInvitation'])->name('colocation.join.manual');
+    Route::post('/invitation/accept', [InvitationColoc::class, 'acceptInvitation'])->name('invitation.accept');
+    Route::post('/invitation-code/validate', [InvitationColoc::class, 'validateCode'])->name('invitation.byCode');
+    Route::get('/invitation/{token}/decline', [InvitationColoc::class, 'declineInvitation'])->name('invitation.decline');
     Route::resource('expenses', ExpenseController::class);
+    Route::patch('/expenses/{expense}/mark-as-paid', [ExpenseController::class, 'markAsPaid'])->name('expenses.markAsPaid');
+    Route::delete('/colocations/{colocation}', [ColocationController::class, 'destroy'])->name('colocations.destroy');
 
     // Route spécifique pour marquer comme payé (PaymentController)
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
