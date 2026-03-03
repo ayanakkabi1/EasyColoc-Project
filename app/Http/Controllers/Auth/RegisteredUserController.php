@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Invitation;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -46,6 +47,20 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        // Vérifier s'il y a une invitation en attente
+        if ($request->has('invitation_token')) {
+            $token = $request->input('invitation_token');
+            $invitation = Invitation::where('token', strtoupper($token))
+                ->where('email', $user->email)
+                ->where('expires_at', '>', now())
+                ->whereNull('used_at')
+                ->first();
+
+            if ($invitation) {
+                return redirect()->route('invitation.show', $token);
+            }
+        }
 
         return redirect(route('dashboard', absolute: false));
     }
