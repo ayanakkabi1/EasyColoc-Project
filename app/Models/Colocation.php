@@ -60,7 +60,7 @@ class Colocation extends Model
 
         return $this->users->map(function ($member) use ($allExpenses, $share) {
              
-            $member->total_paid = $allExpenses->where('user_id', $member->id)->sum('amount');
+            $member->total_paid = $allExpenses->where('user_id', $member->id)->sum('montant_expense');
             
             
             $member->balance = $member->total_paid - $share;
