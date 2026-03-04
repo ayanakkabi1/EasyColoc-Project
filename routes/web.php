@@ -26,9 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::get('/create', function () {
-    return view('colocation.create');
-});
+
 Route::middleware('auth')->group(function () {
     Route::get('/colocation/dashboard', [ColocationController::class, 'afficherColocation'])->name('colocation.show');
     Route::get('/create', [ColocationController::class, 'CreateColocation'])->name('colocation.create');
