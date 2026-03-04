@@ -7,7 +7,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('register') }}">
+    <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
         @csrf
 
         @if(request('invitation_token'))
@@ -51,10 +51,33 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
         <div class="mt-4">
-            <label for="photo">Photo de profil (Optionnel)</label>
-            <input id="photo" class="block mt-1 w-full" type="file" name="photo" accept="image/*" />
+            <x-input-label for="photo" :value="__('Photo de profil (Optionnel)')" />
+            <input id="photo" class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" type="file" name="photo" accept="image/*" onchange="previewPhoto(event)" />
+            <p class="text-xs text-gray-500 mt-1">Formats acceptés: JPEG, PNG, JPG, GIF (max 2MB)</p>
             <x-input-error :messages="$errors->get('photo')" class="mt-2" />
+            <div id="photo-preview" class="mt-3 hidden">
+                <img id="preview-image" class="h-24 w-24 rounded-full object-cover border-2 border-gray-300" alt="Aperçu de la photo" />
+            </div>
         </div>
+        
+        <script>
+            function previewPhoto(event) {
+                const file = event.target.files[0];
+                const preview = document.getElementById('photo-preview');
+                const previewImage = document.getElementById('preview-image');
+                
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        preview.classList.remove('hidden');
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.classList.add('hidden');
+                }
+            }
+        </script>
         
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
