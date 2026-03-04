@@ -29,7 +29,7 @@ class Expense extends Model
    
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id');
     }
     
     public function colocation()
@@ -48,7 +48,7 @@ public function getIndividualShare()
 public function getMembersWithBalances($expenses, $share)
 {
     return $this->users->map(function ($member) use ($expenses, $share) {
-        $member->total_paid = $expenses->where('user_id', $member->id)->sum('amount');
+        $member->total_paid = $expenses->where('user_id', $member->id)->sum('montant_expense');
         $member->balance = $member->total_paid - $share;
         return $member;
     });
