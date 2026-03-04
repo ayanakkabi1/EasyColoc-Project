@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/colocation/dashboard', [ColocationController::class, 'afficherColocation'])->name('colocation.show');
     Route::get('/create', [ColocationController::class, 'CreateColocation'])->name('colocation.create');
     Route::post('/colocation/store', [ColocationController::class, 'storeColocation'])->name('Colocation.store');
+    Route::post('/colocation/leave', [ColocationController::class, 'leave'])->name('colocation.leave');
+    Route::patch('/colocation/{colocation}/deactivate', [ColocationController::class, 'deactivate'])->name('colocation.deactivate');
     Route::post('/invitation/envoyer/{colocId}', [InvitationColoc::class, 'envoyerInvitation'])->name('invitation.send');
     Route::post('/invitation/accept', [InvitationColoc::class, 'acceptInvitation'])->name('invitation.accept');
     Route::post('/invitation-code/validate', [InvitationColoc::class, 'validateCode'])->name('invitation.byCode');
