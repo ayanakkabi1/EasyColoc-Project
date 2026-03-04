@@ -93,7 +93,11 @@ class InvitationColoc extends Controller
         $invitation = Invitation::where('token', strtoupper($token))
             ->where('expires_at', '>', now())
             ->whereNull('used_at')
-            ->firstOrFail();
+            ->first();
+
+        if (!$invitation) {
+            return redirect()->route('dashboard')->with('error', 'Cette invitation est invalide, expirée ou déjà utilisée.');
+        }
 
         $colocation = $invitation->colocation;
 
