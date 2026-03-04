@@ -73,6 +73,25 @@
                 Ajouter une dépense
             </a>
 
+            <div class="mt-4">
+                @if(auth()->id() === $myColoc->owner_id)
+                <form action="{{ route('colocation.deactivate', $myColoc->id) }}" method="POST" class="inline" onsubmit="return confirm('Confirmer la désactivation de cette colocation ?');">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-red-700 transition ease-in-out duration-150 shadow-sm">
+                        Désactiver la colocation
+                    </button>
+                </form>
+                @else
+                <form action="{{ route('colocation.leave') }}" method="POST" class="inline" onsubmit="return confirm('Confirmer que vous voulez quitter cette colocation ?');">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-amber-500 border border-transparent rounded-xl font-bold text-xs text-white uppercase tracking-widest hover:bg-amber-600 transition ease-in-out duration-150 shadow-sm">
+                        Quitter la colocation
+                    </button>
+                </form>
+                @endif
+            </div>
+
             @if(auth()->id() === $myColoc->owner_id)
             <div class="mt-8 bg-white overflow-hidden shadow-sm sm:rounded-lg border-l-4 border-emerald-500">
                 <div class="p-6">
