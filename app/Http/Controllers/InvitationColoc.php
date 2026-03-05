@@ -17,7 +17,7 @@ class InvitationColoc extends Controller
         $token = strtoupper(Str::random(8));
         $coloc = Colocation::findOrfail($colocId);
         
-        // Vérifier que l'utilisateur est le propriétaire
+        
         if ($coloc->owner_id !== Auth::id()) {
             return back()->with('error', 'Seul l\'administrateur peut inviter des membres.');
         }
